@@ -13,7 +13,7 @@ interface Post {
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
+  @Get('post')
   getPost(): Post {
     return {
       author: 'Tyron Woo',
