@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { PostsService } from './posts.service';
 
 interface PostModel {
@@ -42,7 +42,12 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  getPost() {
+  getPosts() {
     return posts;
+  }
+
+  @Get(':id')
+  getPost(@Param('id') id: string) {
+    return posts.find((post) => post.id === +id);
   }
 }
