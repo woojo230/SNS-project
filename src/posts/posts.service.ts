@@ -12,33 +12,6 @@ export interface PostModel {
   commentCount: number;
 }
 
-let posts: PostModel[] = [
-  {
-    id: 1,
-    author: 'Tyron Woo',
-    title: 'coco',
-    content: 'i got the coco',
-    likeCount: 20,
-    commentCount: 10,
-  },
-  {
-    id: 2,
-    author: 'Tyron Kim',
-    title: 'popo',
-    content: 'i got the popo',
-    likeCount: 20,
-    commentCount: 10,
-  },
-  {
-    id: 3,
-    author: 'Tyron Yang',
-    title: 'popo',
-    content: 'i got the',
-    likeCount: 20,
-    commentCount: 10,
-  },
-];
-
 @Injectable()
 export class PostsService {
   constructor(
