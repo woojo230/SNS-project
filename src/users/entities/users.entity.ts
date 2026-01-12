@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { RolesEnum } from '../const/roles.const';
+import { PostModel } from 'src/posts/posts.service';
 
 @Entity()
 export class UsersModel {
@@ -25,4 +26,6 @@ export class UsersModel {
     default: RolesEnum.USER,
   })
   role: RolesEnum;
+
+  posts: PostModel[];
 }
