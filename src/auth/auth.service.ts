@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { JWT_SECRET } from './const/auth.const';
+import { access } from 'fs';
 
 @Injectable()
 export class AuthService {
@@ -24,5 +25,12 @@ export class AuthService {
       secret: JWT_SECRET,
       expiresIn: isRefreshToken ? 3600 : 300,
     });
+  }
+
+  loginUser(user: Pick<UsersModel, 'email' | 'id'>) {
+    return {
+      accessToken: this.signToken(user, false),
+      refreshToken: this.signToken(user, true),
+    };
   }
 }
