@@ -13,6 +13,43 @@ export class AuthService {
   ) {}
 
   /**
+   * Header로부터 token 을 받는 2가지 경우
+   * {authorization: 'Basic {token}'}
+   * {authorization: 'Bearer {token}'}
+   */
+  extrackTokenFromHeader(header: string, isBearer: boolean) {
+    const splitToken = header.split(' ');
+
+    const prefix = isBearer ? 'Bearer' : 'Basic';
+
+    if (splitToken.length !== 2 || splitToken[0] !== prefix) {
+      throw new UnauthorizedException('잘못된 토큰입니다');
+    }
+    const token = splitToken[1];
+
+    return token;
+  }
+
+  // 1. 인코딩된 값을 디코딩 (asdfa... -> email:password)
+  // 2. email:password -> [email, password] 식으로 split
+  // 3. {email:email, password:password} 식으로 반환
+  decodeBasicToken(base64String: string) {
+    const decoded = Buffer.from(base64String, 'base64').toString('utf-8');
+    const split = decoded.split(':');
+
+    if (split.length !== 2) {
+      throw new UnauthorizedException('잘못된 유형의 토큰입니다');
+    }
+    const email = split[0];
+    const password = split[1];
+
+    return {
+      email,
+      password,
+    };
+  }
+
+  /**
    * payload =
    *  1) emial
    *  2) sub -> id
@@ -70,7 +107,10 @@ export class AuthService {
     // salt는 자동 생성됨
     const hash = await bcrypt.hash(user.password, HASH_ROUNDS);
 
-    const newUser = await this.userService.createUser(user);
+    const newUser = await this.userService.createUser({
+      ...user,
+      password: hash,
+    });
 
     return this.loginUser(newUser);
   }
