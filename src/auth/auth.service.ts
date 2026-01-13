@@ -57,4 +57,6 @@ export class AuthService {
 
     return existingUser;
   }
+
+  async loginWithEmail(user: Pick<UsersModel, 'email' | 'password'>) {}
 }
