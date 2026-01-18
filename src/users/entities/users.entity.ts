@@ -9,18 +9,27 @@ import {
 import { RolesEnum } from '../const/roles.const';
 import { PostsModel } from 'src/posts/entities/posts.entity';
 import { BaseModel } from 'src/common/entity/base.entity';
+import { IsEmail, IsString, Length } from 'class-validator';
 
 @Entity()
 export class UsersModel extends BaseModel {
+  @IsString()
   @Column()
+  @Length(1, 20)
   nickname: string;
 
+  @IsString()
+  @IsEmail()
   @Column({
     length: 20,
     unique: true,
   })
   email: string;
 
+  @IsString()
+  @Length(1, 8, {
+    message: 'nickname은 1~20자 사이로 입력해주세요',
+  })
   @Column({
     unique: true,
   })
