@@ -5,6 +5,7 @@ import { PostsModel } from './entities/posts.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
+import { HOST, PROTOCOL } from 'src/common/const/env.const';
 
 // export interface PostModel {
 //   id: number;
@@ -38,7 +39,35 @@ export class PostsService {
       },
       take: dto.take,
     });
-    return { data: posts };
+
+    const lastItem =
+      posts.length > 0 && posts.length === dto.take
+        ? posts[posts.length - 1]
+        : null;
+
+    const nextUrl = lastItem && new URL(`${PROTOCOL}://${HOST}/posts`);
+
+    if (nextUrl) {
+      for (const key of Object.keys(dto)) {
+        if (dto[key]) {
+          if (key !== 'where__id__more_than') {
+            nextUrl.searchParams.append(key, dto[key]);
+          }
+        }
+      }
+
+      nextUrl.searchParams.append(
+        'where__id__more_than',
+        lastItem.id.toString(),
+      );
+    }
+
+    return {
+      data: posts,
+      cursur: { after: lastItem?.id },
+      count: posts.length,
+      next: nextUrl?.toString(),
+    };
   }
 
   async generatePosts(userId: number) {
