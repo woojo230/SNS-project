@@ -41,6 +41,16 @@ export class PostsService {
     return { data: posts };
   }
 
+  async generatePosts(userId: number) {
+    for (let i = 0; i < 100; i++) {
+      await this.createPost(userId, {
+        title: `임의로 생성된 포스트 제목 ${i}`,
+        content: `임의로 생성된 포스트 내용 ${i}`,
+        // images: [],
+      });
+    }
+  }
+
   async getPostById(id: number) {
     // repository 사용하는 모든 함수들은 비동기로 작동
     const post = await this.postsRepository.findOne({

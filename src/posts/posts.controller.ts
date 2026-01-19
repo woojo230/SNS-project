@@ -32,6 +32,13 @@ export class PostsController {
     return this.postsService.getPostById(id);
   }
 
+  @Post('random')
+  async postPostsRandom(@User() user: UsersModel) {
+    await this.postsService.generatePosts(user.id);
+
+    return true;
+  }
+
   @Post()
   @UseGuards(AccessTokenGuard)
   postPosts(@User('id') userId: number, @Body() body: CreatePostDto) {
