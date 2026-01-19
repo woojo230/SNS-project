@@ -27,6 +27,8 @@ export class PostsService {
     });
   }
 
+  pagenatePosts() {}
+
   async getPostById(id: number) {
     // repository 사용하는 모든 함수들은 비동기로 작동
     const post = await this.postsRepository.findOne({

@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
@@ -15,13 +16,14 @@ import { UsersModel } from 'src/users/entities/users.entity';
 import { User } from 'src/users/decorator/user.decorator';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { PagenatePostDto } from './dto/pagenate-post.dto';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  getPosts() {
+  getPosts(@Query() query: PagenatePostDto) {
     return this.postsService.getAllPosts();
   }
 
