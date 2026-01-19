@@ -18,6 +18,7 @@ import {
 import { lengthValidationMessage } from 'src/common/validation-message/length-validation.message';
 import { stringValidationMessage } from 'src/common/validation-message/string-validation.message';
 import { emailValidationMessage } from 'src/common/validation-message/email-validation.message';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class UsersModel extends BaseModel {
@@ -44,6 +45,9 @@ export class UsersModel extends BaseModel {
   @IsString({ message: stringValidationMessage })
   @Length(3, 8, {
     message: lengthValidationMessage,
+  })
+  @Exclude({
+    toPlainOnly: true,
   })
   @Column({
     unique: true,
