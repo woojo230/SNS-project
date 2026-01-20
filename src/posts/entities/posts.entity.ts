@@ -1,4 +1,7 @@
+import { Transform } from 'class-transformer';
 import { IsString } from 'class-validator';
+import { join, posix } from 'path';
+import { POST_PUBLIC_IMAGE_PATH } from 'src/common/const/path.const';
 import { BaseModel } from 'src/common/entity/base.entity';
 import { stringValidationMessage } from 'src/common/validation-message/string-validation.message';
 import { UsersModel } from 'src/users/entities/users.entity';
@@ -30,6 +33,11 @@ export class PostsModel extends BaseModel {
 
   @Column({
     nullable: true,
+  })
+  @Transform(({ value }) => {
+    if (!value) return value;
+    const fullPath = `/${POST_PUBLIC_IMAGE_PATH}/${value}`;
+    return fullPath.replace(/\\/g, '/');
   })
   image?: string;
 
