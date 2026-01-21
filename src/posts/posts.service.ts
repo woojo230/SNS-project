@@ -138,7 +138,7 @@ export class PostsService {
     return post;
   }
 
-  async createPost(authorId: number, postDto: CreatePostDto, image?: string) {
+  async createPost(authorId: number, postDto: CreatePostDto) {
     // 1) create -> 저장할 객체를 생성.(DB에 저장하는 것이 아닌, 객체만 생성하기 때문에 동기적으로 실행됨)
     // 2) save -> 객체를 저장. (create 매서드에서 생성한 객체로) (실제 DB에 저장하기 때문에 비동기적으로 실행)
 
@@ -148,7 +148,6 @@ export class PostsService {
         id: authorId,
       },
       ...postDto,
-      image: image,
       likeCount: 0,
       commentCount: 0,
     });
