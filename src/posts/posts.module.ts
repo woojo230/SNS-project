@@ -12,13 +12,15 @@ import { extname } from 'path';
 import * as multer from 'multer';
 import { POST_IMAGE_PATH } from 'src/common/const/path.const';
 import { v4 as uuid } from 'uuid';
+import { ImageModel } from 'src/common/entity/image.entity';
+import { PostsImagesService } from './image/images.service';
 
 @Module({
   imports: [
     JwtModule.register({}),
-    TypeOrmModule.forFeature([PostsModel, UsersModel]),
+    TypeOrmModule.forFeature([PostsModel, UsersModel, ImageModel]),
   ],
   controllers: [PostsController],
-  providers: [PostsService, AuthService, UsersService],
+  providers: [PostsService, AuthService, UsersService, PostsImagesService],
 })
 export class PostsModule {}

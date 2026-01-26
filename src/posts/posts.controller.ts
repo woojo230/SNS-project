@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   Param,
   ParseIntPipe,
   Patch,
@@ -20,10 +21,17 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageModelType } from 'src/common/entity/image.entity';
+import { DataSource } from 'typeorm';
+import { PostsImagesService } from './image/images.service';
 
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly postsImageService: PostsImagesService,
+    private readonly dataSource: DataSource,
+  ) {}
 
   @Get()
   getPosts(@Query() query: PaginatePostDto) {
@@ -50,8 +58,32 @@ export class PostsController {
     @Body() body: CreatePostDto,
     // @UploadedFile() file?: Express.Multer.File,
   ) {
-    await this.postsService.createPostImage(body);
-    return this.postsService.createPost(userId, body);
+    const qr = this.dataSource.createQueryRunner();
+    await qr.connect();
+    await qr.startTransaction();
+    try {
+      const post = await this.postsService.createPost(userId, body, qr);
+
+      if (body.images) {
+        for (let i = 0; i < body.images.length; i++) {
+          await this.postsImageService.createPostImage(
+            {
+              post,
+              order: i,
+              path: body.images[i],
+              type: ImageModelType.POST_IMAGE,
+            },
+            qr,
+          );
+        }
+      }
+
+      return this.postsService.getPostById(post.id);
+    } catch (error) {
+      await qr.rollbackTransaction();
+      await qr.release();
+      throw new InternalServerErrorException('에러발생');
+    }
   }
 
   @Patch(':id')
