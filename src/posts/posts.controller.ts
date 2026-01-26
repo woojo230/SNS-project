@@ -22,16 +22,18 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageModelType } from 'src/common/entity/image.entity';
-import { DataSource } from 'typeorm';
+import * as typeorm from 'typeorm';
 import { PostsImagesService } from './image/images.service';
 import { LogInterceptor } from 'src/common/interceptor/log.interceptor';
+import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
+import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 
 @Controller('posts')
 export class PostsController {
   constructor(
     private readonly postsService: PostsService,
     private readonly postsImageService: PostsImagesService,
-    private readonly dataSource: DataSource,
+    private readonly dataSource: typeorm.DataSource,
   ) {}
 
   @Get()
@@ -55,40 +57,29 @@ export class PostsController {
 
   @Post()
   @UseGuards(AccessTokenGuard)
+  @UseInterceptors(TransactionInterceptor)
   async postPosts(
     @User('id') userId: number,
     @Body() body: CreatePostDto,
+    @QueryRunner() qr: typeorm.QueryRunner,
     // @UploadedFile() file?: Express.Multer.File,
   ) {
-    const qr = this.dataSource.createQueryRunner();
-    await qr.connect();
-    await qr.startTransaction();
-    try {
-      const post = await this.postsService.createPost(userId, body, qr);
+    const post = await this.postsService.createPost(userId, body, qr);
 
-      if (body.images) {
-        for (let i = 0; i < body.images.length; i++) {
-          await this.postsImageService.createPostImage(
-            {
-              post,
-              order: i,
-              path: body.images[i],
-              type: ImageModelType.POST_IMAGE,
-            },
-            qr,
-          );
-        }
+    if (body.images) {
+      for (let i = 0; i < body.images.length; i++) {
+        await this.postsImageService.createPostImage(
+          {
+            post,
+            order: i,
+            path: body.images[i],
+            type: ImageModelType.POST_IMAGE,
+          },
+          qr,
+        );
       }
-      await qr.commitTransaction();
-      return this.postsService.getPostById(post.id);
-    } catch (error) {
-      await qr.rollbackTransaction();
-      throw new InternalServerErrorException(
-        error.message || '게시글 생성 중 에러 발생',
-      );
-    } finally {
-      await qr.release();
     }
+    return this.postsService.getPostById(post.id, qr);
   }
 
   @Patch(':id')
