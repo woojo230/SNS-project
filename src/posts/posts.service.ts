@@ -90,6 +90,7 @@ export class PostsService {
     }
 
     const posts = await this.postsRepository.find({
+      ...DEFAULT_POST_FIND_OPTIONS,
       where,
       order: {
         createdAt: dto.order__createdAt,

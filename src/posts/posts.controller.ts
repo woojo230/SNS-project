@@ -77,12 +77,15 @@ export class PostsController {
           );
         }
       }
-
+      await qr.commitTransaction();
       return this.postsService.getPostById(post.id);
     } catch (error) {
       await qr.rollbackTransaction();
+      throw new InternalServerErrorException(
+        error.message || '게시글 생성 중 에러 발생',
+      );
+    } finally {
       await qr.release();
-      throw new InternalServerErrorException('에러발생');
     }
   }
 
