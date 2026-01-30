@@ -20,6 +20,7 @@ import {
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { PUBLIC_FOLDER_PATH } from './common/const/path.const';
 import { ImageModel } from './common/entity/image.entity';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { ImageModel } from './common/entity/image.entity';
     UsersModule,
     AuthModule,
     CommonModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [
