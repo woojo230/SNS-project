@@ -19,6 +19,7 @@ import { lengthValidationMessage } from 'src/common/validation-message/length-va
 import { stringValidationMessage } from 'src/common/validation-message/string-validation.message';
 import { emailValidationMessage } from 'src/common/validation-message/email-validation.message';
 import { Exclude } from 'class-transformer';
+import { CommentsModel } from 'src/posts/comments/entity/comments.entity';
 
 @Entity()
 export class UsersModel extends BaseModel {
@@ -62,4 +63,7 @@ export class UsersModel extends BaseModel {
 
   @OneToMany(() => PostsModel, (post) => post.author)
   posts: PostsModel[];
+
+  @OneToMany(() => CommentsModel, (commets) => commets.author)
+  postComments: CommentsModel[];
 }
